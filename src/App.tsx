@@ -50,12 +50,15 @@ function App() {
     } else if (level === 2) {
       // Decrypt Hex
       try {
-        return encryptedPath.replace(/[^0-9a-fA-F]/g, "");
+        const hexPath = encryptedPath.replace(/[^0-9a-fA-F]/g, "");
+        console.log("Decrypted Hex path:", hexPath); // Log the decrypted hex path
+        return hexPath;
       } catch (error) {
         console.error("Error decrypting Hex path:", error);
         return "";
       }
     }
+    console.error("Unsupported level:", level);
     return "";
   };
 
@@ -66,7 +69,11 @@ function App() {
   useEffect(() => {
     if (data.encrypted_path && data.level !== undefined) {
       const path = decryptPath(data.encrypted_path, data.level);
-      setDecryptedPath(path);
+      if (path) {
+        setDecryptedPath(path);
+      } else {
+        console.error("Failed to decrypt path");
+      }
     }
   }, [data]);
 
@@ -103,7 +110,10 @@ function App() {
         <div style={{ marginTop: "2rem" }}>
           <button
             type="button"
-            onClick={() => fetchAndSetData(`/api/${decryptedPath}`)}
+            onClick={() => {
+              console.log("Fetching with decrypted path:", decryptedPath);
+              fetchAndSetData(`/api/${decryptedPath}`);
+            }}
           >
             ⏳ Load next level...
           </button>
